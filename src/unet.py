@@ -82,8 +82,8 @@ class build_unet(nn.Module):
         super().__init__()
 
         """ Encoder """
-        self.e1 = encoder_block(4, 32) # we should change this to 3
-        self.e2 = encoder_block(32, 64)
+        self.e1 = encoder_block(1, 4)
+        self.e2 = encoder_block(4, 64)
         self.e3 = encoder_block(64, 128)
         self.e4 = encoder_block(128, 256)
 
@@ -94,10 +94,10 @@ class build_unet(nn.Module):
         self.d1 = decoder_block(512, 256)
         self.d2 = decoder_block(256, 128)
         self.d3 = decoder_block(128, 64)
-        self.d4 = decoder_block(64, 32)
+        self.d4 = decoder_block(64, 4)
 
         """ Classifier """
-        self.outputs = nn.Conv2d(32, 12, kernel_size=1, padding=0)
+        self.outputs = nn.Conv2d(4, 4, kernel_size=1, padding=0)
 
     def forward(self, inputs):
         """ Encoder """
