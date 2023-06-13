@@ -19,7 +19,7 @@ class Resize256x256(torch.nn.Module):
     def forward(self, x):
         return F.interpolate(x, size=(256, 256), mode='bilinear')
 
-class GenISPV2(nn.Module):
+class PreNet(nn.Module):
     def __init__(self, in_channels, hidden_channels, out_features):
         """
         Initialize GenISP network
@@ -29,7 +29,7 @@ class GenISPV2(nn.Module):
             hidden_channels: list of two numbers which are number of hidden features
             out_features: number of features in output layer
         """
-        super(GenISPV2, self).__init__()        
+        super(PreNet, self).__init__()        
         self.convWB = self.conv_wb(in_channels, hidden_channels, 3)
         self.convCC = self.conv_cc(in_channels, hidden_channels, 9)
         self.shallow = self.shallowSQ(in_channels,hidden_channels,out_features)
