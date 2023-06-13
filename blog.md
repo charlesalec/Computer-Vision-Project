@@ -14,7 +14,6 @@ These 2 architectures are connected in the following way:
 ```
 output1 = PreNet(imagergb)
 output2 = F.pad(input=output1, pad=(2, 2, 2, 2))
-
 output = UNet(output2)
 ```
 - Explain how the 2 architectures connect
@@ -27,6 +26,7 @@ For our pre-processing pipeline we have taken inspiration from the Proposed pre-
 
 <figure><img src="images/image-3.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>How the output of the ConvCC block is applied to the colors of the image</b></figcaption></figure>
 
+Finally the new image is fed into the Shallow ConcNet block and the output is then a new image that should be easier for U-Net to preform image segmentation on.
 
 - Explain our Pre-Net
 - Reference GenISP
