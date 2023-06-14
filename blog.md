@@ -131,6 +131,14 @@ The architecture is shown in the following figure.
 - Why did we run the experiment we did?
 - What weights did we use?
 
+At first we trained the UNet for 10 epochs with the Cityscapes dataset. After the training we extracted the weights of the trained network in the 'model.pth' file. The idea as mentioned above is to use the PreNet (GenISP) network before the pretrained vanilla U-Net hoping that with the pre-processing network we will make the data easier segmentable for the UNet.
+Subsequently, in order to train the final pipeline, we load the weights of the pre-trained vanilla U-Net from the 'model.pth' file and we freeze the U-Net parameters setting the parametes' <em>requires_grad</em> parameter to False so that the U-Net parameters will not train again as it is already pre-trained.
+
+```python 
+for param in UNet.parameters():
+    param.requires_grad = False # Freeze the UNet weights
+```
+
 ## Results - Training Set
 In this section we will outline the results obtained via the experiments on the trainin set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
 
