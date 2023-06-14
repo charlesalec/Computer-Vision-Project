@@ -256,7 +256,7 @@ Clearly, the U-Net is performiing generally well, given the fact that it is only
 
 It is worth stating again, that given the short training time/number of epochs, one can safely assume that the network would eventually improve on these minor areas, however, extensive training was considered to be out of the scope of this project, since we are drawing a comparison between two architectures, we were mostly interested in the shape of the loss curve, and the accuracy.
 
-Finally, looking at the average accuracy, the U-Net alone reaches an accuracy of 0.9706.
+Finally, looking at the average accuracy, the U-Net alone reaches an accuracy of **0.9706**.
 
 ### Pre-Net with U-Net
 At this point in time, we have a trained U-Net on an urban scenery data segmentation task. The next objective is to freeze the weights of the trained U-Net, which we do as follows:
@@ -286,7 +286,16 @@ The training loss curve is given below:
 
 Note that both loss curves for the U-Net and the U-Net with pre-net are at the same scale on the y-axis. The first aspect to comment on is that the initial loss is much lower for the combined network than for the U-Net alone, which one can assume is the  effect from the trained U-Net. The loss still converges, reaching roughly the same value as for the U-Net alone on the training set. 
 
-The average accuracy for the training set with the combined network is 0.9638, meaning that this network is slightly less accurate than the U-Net alone. 
+The average accuracy for the training set with the combined network is **0.9638**, meaning that this network is slightly less accurate than the U-Net alone. 
+
+## Results - Test Set
+After performing the testing procedure as described above we have the following results. As mentioned above the accuracy of the UNet only is **0.9706** whilst the accuracy of the combined pipeline is **0.9638**. Below we illustrate a comparison of the prediction to the ground truth from the testing set for the U-Net. On the left there is the predicted segmentation and on the right its the ground truth. As we can see the model performs really well even in the objects that are very far apart.
+
+<figure><img src="images/eleni.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Prediction and ground trouth comparison in the test set</b></figcaption></figure>
+
+Finally we will demonstrate the same comparison for the combined PreNet and U-Net pipeline. As we can see the segmentation is again very good as the predicted image is very close to the ground truth.
+
+<figure><img src="images/hellooo.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Prediction and ground trouth comparison in the test set</b></figcaption></figure>
 
 ### Discussion
 The first aspect to discuss is the results of the U-Net, which clearly seems to have satisfactory results after 10 epochs. This should not come as a surprise - as we mentioned earlier, the U-Net has a proven track record for segmentation tasks, as seen in publications such as [7]. However, when it comes to the Cityscapes dataset, we could not find any publications that used this specific combination, only a blog post on Medium had the same base setup, meaning the idea is somewhat novel, and yielding very satisfactory results, as illustrated in the segmentation map figures above.
@@ -303,9 +312,10 @@ keep to making sure we don't get penalized by this:
 - Why do we think it acts like that?
 - How can they be interpreted?
 
-## Results - Test Set
 
 ## Next Step
+For future work we would like to leave some hyperparameter tuning for example train the models for more epochs. The reason we did not do that is that the dataset is big and our resources and time were limited and we decided to train it for 10 epochs which is not a big number but adequate to lead us to results and comparisons.
+
 - Future work
     - train for more epochs!
 
