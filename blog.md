@@ -149,10 +149,85 @@ for param in UNet.parameters():
 
 We set the input parameters like epochs (10) and learning rate (0.0001) which turned out to be the optimal and more stable after parameter tuning. The number of input channels are 3 as they represent the three channels (R, G, B). We initialize the parameters of the GenISP network as adviced in previous research papers that created it. We decided to run the loops on the cuda GPU, because of its much higher parallel performance in order to processing epochs faster.
 
-The training loop performs the forward and backward passes of the network. The input data is fed to the PreNet and the output of the PreNet is the fed to the pre-trained U-Net model after some adjustments in the size using padding. We use Cross Entropy Loss as the criterion and the Adam optimizer based on the literature and our research.
+The training loop performs the forward and backward passes of the network. The input data is fed to the PreNet and the output of the PreNet is the fed to the pre-trained U-Net model after some adjustments in the size using padding. We use Cross Entropy Loss as the criterion and the Adam optimizer based on the literature and our research. As we see below every 1000 inputs we show the ground truth image next to the prediction image so we can monitor the progress of the training. A sample of these pictures is illustrated in the Results section.
+
+```python 
+t = trange(epochs, desc="Epochs", leave=True)
+for epoch in t:
+    # TODO: use tqdm for progress bar
+    for idx_batch, (imagergb, labelmask, labelrgb) in enumerate(img_batch):
+        imagergb = imagergb.to(device)
+        labelmask = labelmask.to(device)
+        labelrgb = labelrgb.to(device)
+        # print(imagergb.shape)
+        optimizer.zero_grad()
+        # net = nn.Sequential(PreNet, F.pad(input=PreNet(imagergb), pad=(2, 2, 2, 2)),UNet)
+        output1 = PreNet(imagergb)
+        output2 = F.pad(input=output1, pad=(2, 2, 2, 2))
+    
+        output = UNet(output2)
+        loss = criterion(output, labelmask)
+        loss.backward()
+        optimizer.step()
+        train_loss.append(loss.item())
+
+        if idx_batch % 1000 == 0:
+            print("Epoch: {}/{}, Batch: {}/{}, Loss: {:.4f}".format(epoch+1, epochs, idx_batch+1, len(img_batch), loss.item()))
+            # Display the output and ground truth next to eachother 
+            output = output.detach().cpu().numpy()
+            output = np.argmax(output, axis=1)
+            output_batch = output.shape[0]
+            output = output.reshape((output_batch, output.shape[1], output.shape[2]))
+            # output = output.reshape((output.shape[1], output.shape[2]))
+
+
+            labelmask = labelmask.detach().cpu().numpy()
+            labelmast_batch = labelmask.shape[0]
+            labelmask = labelmask.reshape((labelmast_batch, labelmask.shape[1], labelmask.shape[2]))
+            # labelmask = labelmask.reshape((labelmask.shape[1], labelmask.shape[2]))
+            # plt.imshow(output)
+            # plt.show()
+            # plt.imshow(labelmask)
+            # plt.show()
+            
+            
+            # concat output and labelmask
+            output = np.concatenate((output, labelmask), axis=2)
+            plt.imshow(output[1])
+            plt.show()
+
+```
 
 ## Testing Procedure
 The purpose of this function is to perform the same iterations as the training function but on a different set of unseen images which is the test set and without the back propagation. For that we have already trained the PreNet seperately as well so we can get the PreNet wights the same way we did with the UNet. After loading the weights for both networks we proceed to predict the outputs of the pipeline of course without performing back propagation (using <em>with torch.no_grad()</em>). To calculate the accuracy we sum the correct answers and divide them by the total test set size so we can have the percentage of the test images that had been segmented correctly. For that as the problem is image segmentation and not classification we have to use the image and the label masks so that we can check if the object detection is correct, hence if the prediction is correct.
+
+```python
+history_accuracy = []
+with torch.no_grad(): 
+    # for data in test_data: 
+    for idx_batch, (imagergb, labelmask, labelrgb) in enumerate(img_batch):
+        imagergb = imagergb.to(device)
+        labelmask = labelmask.to(device)
+        labelrgb = labelrgb.to(device)
+        
+        output1 = PreNet(imagergb)
+        output2 = F.pad(input=output1, pad=(2, 2, 2, 2))
+        predicted_outputs = UNet(output2)
+        pred_class = torch.zeros((predicted_outputs.size()[0], predicted_outputs.size()[2], predicted_outputs.size()[3]))
+        for idx in range(0, predicted_outputs.size()[0]):
+            pred_class[idx] = torch.argmax(predicted_outputs[idx], dim=0).cpu().int()
+
+        pred_class = pred_class.unsqueeze(1).float()
+        labelmask = labelmask.unsqueeze(1).float()
+
+        acc_sum = (pred_class == labelmask).sum()
+        acc = float(acc_sum) / (labelmask.size()[0]*labelmask.size()[2]*labelmask.size()[3])
+        history_accuracy.append(acc)
+```
+
+print(history_accuracy)
+print('Average accuracy:%.4f' % (sum(history_accuracy)/len(history_accuracy))) 
+
 
 ## Results - Training Set
 In this section we will outline the results obtained via the experiments on the trainin set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
