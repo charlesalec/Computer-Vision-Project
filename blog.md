@@ -1,7 +1,7 @@
 # Adding a trainable pre-processing to U-Net
 
 ## Goals
-Since the advent of deep learning, the task of segmentation has become one of the principle vision tasks, with applications in the medical field (to segment bones, tissue, amongst many others) all the way too applications in environmental planning, disaster management, and autonomous vehicles. In this blog post, we discuss our attempts at improving a well known network used for segmentation: the U-Net, which will be further discussed in the architecture section. The U-Net has become an eponymous network, and has shown promising results across a variety of segmentation tasks. Originally made and trained in order to do segmentation on medical images [add precision] [2], it has also been used to 'lighten' dark images [4]. The specific segmentation task at hand concerns the Cityscapes dataset [5], a well known urban scenes dataset. More specifically, we work with the gtFine dataset (roughly XXXXX images). Our aim is to hopefully improve the segmentation results of the U-Net by adding a network at the front (to preprocess the data) and hopefully improve the performance (accuracy) of the U-Net. Our motivation stems from the inspiration drawn from the GenISP network introduced in reference [1]. This network aims to enhance the interpretability of images for subsequent processing by the network. Similarly, we seek to improve the segmentation results by augmenting the U-Net with a pre-processing network that can make the input data more informative and conducive to accurate segmentation.
+Since the advent of deep learning, the task of segmentation has become one of the principle vision tasks, with applications in the medical field (to segment bones, tissue, amongst many others) all the way too applications in environmental planning, disaster management, and autonomous vehicles. In this blog post, we discuss our attempts at improving a well known network used for segmentation: the U-Net, which will be further discussed in the architecture section. The U-Net has become an eponymous network, and has shown promising results across a variety of segmentation tasks. Originally made and trained in order to do segmentation on medical images [add precision] [2], it has also been used to 'lighten' dark images [4]. The specific segmentation task at hand concerns the Cityscapes dataset [3], a well known urban scenes dataset. More specifically, we work with the gtFine dataset (roughly XXXXX images). Our aim is to hopefully improve the segmentation results of the U-Net by adding a network at the front (to preprocess the data) and hopefully improve the performance (accuracy) of the U-Net. Our motivation stems from the inspiration drawn from the GenISP network introduced in reference [1]. This network aims to enhance the interpretability of images for subsequent processing by the network. Similarly, we seek to improve the segmentation results by augmenting the U-Net with a pre-processing network that can make the input data more informative and conducive to accurate segmentation.
 
 By incorporating a trainable pre-processing network, we aim to enhance the U-Net's ability to effectively capture and interpret the features relevant to urban scene segmentation. Through this approach, we aspire to achieve improved performance in terms of segmentation accuracy, thereby advancing the capabilities of the U-Net and contributing to the broader field of computer vision and image analysis.
   
@@ -30,7 +30,7 @@ Through our exploration of the U-Net architecture in the context of urban scene 
 - What are we trying to achieve?
 
 ## Architecture
-For this implementation we attempted to connect two different architectures together. The first is a trainable pre-processing pipeline that was used in the past by [1] order to attempt the make object detectors see better in the dark. The second architecture is a vanilla [2] U-Net that we trained in semantic segmentation with the Cityscapes dataset [3]. The goal of this architecture is to improve the performance of the U-Net by pre-processing the images in a way that makes it easier for the U-Net to segment the images.
+For this implementation we attempted to connect two different architectures together. The first is a trainable pre-processing pipeline that was used in the past by [1] order to attempt the make object detectors see better in the dark. The second architecture is a vanilla [2][5] U-Net that we trained in semantic segmentation with the Cityscapes dataset [3]. The goal of this architecture is to improve the performance of the U-Net by pre-processing the images in a way that makes it easier for the U-Net to segment the images.
 
 The output of the pre-processing pipeline is a new image that is then fed into the U-Net.
 These 2 architectures are connected in the following way:
@@ -323,15 +323,12 @@ For future work we would like to leave some hyperparameter tuning for example tr
 # References:
 [1] Morawski, I., Chen, Y. A., Lin, Y. S., Dangi, S., He, K., & Hsu, W. H. (2022). Genisp: Neural isp for low-light machine cognition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 630-639).
 
-[2] !TODO: Add U-Net reference
+[2] Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... & Girshick, R. (2023). Segment anything. arXiv preprint arXiv:2304.02643.
 
 [3] Cordts, M., Omran, M., Ramos, S., Rehfeld, T., Enzweiler, M., Benenson, R., ... & Schiele, B. (2016). The cityscapes dataset for semantic urban scene understanding. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3213-3223).
 
-[4] Learning to see in th edark [!TODO]
+[4] Chen, C., Chen, Q., Xu, J., & Koltun, V. (2018). Learning to see in the dark. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3291-3300).
 
+[5] Pan, Zhuokun, et al. "Deep learning segmentation and classification for urban village using a worldview satellite image based on U-Net." Remote Sensing 12.10 (2020): 1574.
 
-[5] Cityscapes dataset [!TODO]
-
-[6] Pan, Zhuokun, et al. "Deep learning segmentation and classification for urban village using a worldview satellite image based on U-Net." Remote Sensing 12.10 (2020): 1574.
-
-[7] Guo, Zhiling, et al. "Semantic segmentation for urban planning maps based on U-Net." IGARSS 2018-2018 IEEE International Geoscience and Remote Sensing Symposium. IEEE, 2018.
+[6] Guo, Zhiling, et al. "Semantic segmentation for urban planning maps based on U-Net." IGARSS 2018-2018 IEEE International Geoscience and Remote Sensing Symposium. IEEE, 2018.
