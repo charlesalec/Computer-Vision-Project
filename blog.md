@@ -109,10 +109,16 @@ The architecture is shown in the following figure.
 
 ## Training Procedure
 - How did we train it?
+- What experiment did we run?
+- Why did we run the experiment we did?
 - What weights did we use?
 
 ## Results
+keep to making sure we don't get penalized by this:
+![Alt text](image.png)
 - What results did we get?
+- Explain results
+- Motivate results
 - Why do we think it acts like that?
 - How can they be interpreted?
 
