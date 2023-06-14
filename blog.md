@@ -131,8 +131,16 @@ The architecture is shown in the following figure.
 - Why did we run the experiment we did?
 - What weights did we use?
 
-At first we trained the UNet for 10 epochs with the Cityscapes dataset. After the training we extracted the weights of the trained network in the 'model.pth' file. The idea as mentioned above is to use the PreNet (GenISP) network before the pretrained vanilla U-Net hoping that with the pre-processing network we will make the data easier segmentable for the UNet.
-Subsequently, in order to train the final pipeline, we load the weights of the pre-trained vanilla U-Net from the 'model.pth' file and we freeze the U-Net parameters setting the parametes' <em>requires_grad</em> parameter to False so that the U-Net parameters will not train again as it is already pre-trained.
+At first we trained the UNet for 10 epochs with the Cityscapes dataset. After the training we extracted the weights of the trained network in the 'model.pth' file.
+
+```python 
+# Save the model
+torch.save(UNet.state_dict(), "model.pth")
+print("Saved PyTorch Model State to model.pth")
+```
+
+The idea as mentioned above is to use the PreNet (GenISP) network before the pretrained vanilla U-Net hoping that with the pre-processing network we will make the data easier segmentable for the UNet.
+Subsequently, in order to train the final pipeline, we load the weights of the pre-trained vanilla U-Net from the 'model.pth' file and we freeze the U-Net parameters setting the parametes' <em>requires_grad</em> parameter to False so that the U-Net parameters will not train again (they will not be updated by the backward pass) as it is already pre-trained.
 
 ```python 
 for param in UNet.parameters():
@@ -142,6 +150,9 @@ for param in UNet.parameters():
 We set the input parameters like epochs (10) and learning rate (0.0001) which turned out to be the optimal and more stable after parameter tuning. The number of input channels are 3 as they represent the three channels (R, G, B). We initialize the parameters of the GenISP network as adviced in previous research papers that created it. We decided to run the loops on the cuda GPU, because of its much higher parallel performance in order to processing epochs faster.
 
 The training loop performs the forward and backward passes of the network. The input data is fed to the PreNet and the output of the PreNet is the fed to the pre-trained U-Net model after some adjustments in the size using padding. We use Cross Entropy Loss as the criterion and the Adam optimizer based on the literature and our research.
+
+## Testing Procedure
+The purpose of this function is to perform the same iterations as the training function but on a different set of unseen images which is the test set and without the back propagation. For that we have already trained the PreNet seperately as well so we can get the PreNet wights the same way we did with the UNet. After loading the weights for both networks we proceed to predict the outputs of the pipeline of course without performing back propagation (using <em>with torch.no_grad()</em>). To calculate the accuracy we sum the correct answers and divide them by the total test set size so we can have the percentage of the test images that had been segmented correctly. For that as the problem is image segmentation and not classification we have to use the image and the label masks so that we can check if the object detection is correct, hence if the prediction is correct.
 
 ## Results - Training Set
 In this section we will outline the results obtained via the experiments on the trainin set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
