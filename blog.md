@@ -223,11 +223,11 @@ with torch.no_grad():
         acc_sum = (pred_class == labelmask).sum()
         acc = float(acc_sum) / (labelmask.size()[0]*labelmask.size()[2]*labelmask.size()[3])
         history_accuracy.append(acc)
-```
 
 print(history_accuracy)
 print('Average accuracy:%.4f' % (sum(history_accuracy)/len(history_accuracy))) 
 
+```
 
 ## Results - Training Set
 In this section we will outline the results obtained via the experiments on the trainin set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
