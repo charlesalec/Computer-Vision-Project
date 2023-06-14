@@ -12,8 +12,9 @@ By incorporating a trainable pre-processing network, we aim to enhance the U-Net
 - What are we trying to achieve?
 
 ## Architecture
-For this implementation we attempted to connect two different architectures together. The first is a trainable pre-processing pipeline that was used in the past by [1] order to attempt the make object detectors see better in the dark. The second architecture is a vanilla [2] U-Net that we trained in semantic segmentation with the Cityscapes dataset [3].
+For this implementation we attempted to connect two different architectures together. The first is a trainable pre-processing pipeline that was used in the past by [1] order to attempt the make object detectors see better in the dark. The second architecture is a vanilla [2] U-Net that we trained in semantic segmentation with the Cityscapes dataset [3]. The goal of this architecture is to improve the performance of the U-Net by pre-processing the images in a way that makes it easier for the U-Net to segment the images.
 
+The output of the pre-processing pipeline is a new image that is then fed into the U-Net.
 These 2 architectures are connected in the following way:
 ```
 output1 = PreNet(imagergb)
@@ -25,18 +26,86 @@ output = UNet(output2)
 ### Pre-Net [1]
 <figure><img src="images/image-1.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Pre-processing pipeline overview</b></figcaption></figure>
 <figure><img src="images/image.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Diagram of the block in the pre-processing</b></figcaption></figure>
-For our pre-processing pipeline we have taken inspiration from the Proposed pre-processing pipeline from [1]. It consists of several layers of convolutions, Leaky ReLU together with Max pooling, and ending in a Multi Layer Perceptron (MLP) layer. This MLP layer is the only thing that makes the ConvWB and ConvCC blocks different, as they have a different number of outputs (3 and 9 respectively).These outputs are then applied to the pixel values of the image in the following way
+For our pre-processing pipeline we have taken inspiration from the Proposed pre-processing pipeline from [1].
+
+````
+    def forward(self, batch_input):
+        N, C, H, W = batch_input.shape              # Save the old dimensions
+        
+        # Create the WhiteBalance correction matrix from the sub-network and apply it to the (non-resized) image(s)
+        whitebalance = self.convWB(batch_input)
+        batch_input = torch.bmm(whitebalance, batch_input.view(N, C, H*W)).view(N, C, H, W)
+
+        # Create the ColorCorrection matrix from the sub-network and apply it to the (non-resized) image(s)
+        colorcorrection = self.convCC(batch_input)
+        batch_input = torch.bmm(colorcorrection, batch_input.view(N, C, H*W)).view(N, C, H, W)
+        return self.shallow(batch_input)
+````
+
+It consists of several layers of convolutions, Leaky ReLU together with Max pooling, and ending in a Multi Layer Perceptron (MLP) layer. This MLP layer is the only thing that makes the ConvWB and ConvCC blocks different, as they have a different number of outputs (3 and 9 respectively).These outputs are then applied to the pixel values of the image in the following way
 <figure><img src="images/image-2.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>How the output of the ConvWB block is applied to the colors of the image</b></figcaption></figure>
 
 <figure><img src="images/image-3.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>How the output of the ConvCC block is applied to the colors of the image</b></figcaption></figure>
 
 Finally the new image is fed into the Shallow ConcNet block and the output is then a new image that should be easier for U-Net to preform image segmentation on.
-
-- Explain our Pre-Net
-- Reference GenISP
-
 ### U-Net
- - Explain our U-Net
+For the main backbone of our architecture we used a U-Net network that was trined for the task of image segmentation. The architecture goes 4 encoders deep before a bottleneck layer and then 4 decoders. In the forward pass of the network each encoder is connected to both the following decoder and the next encoder. To the next encoder the convolution output is fed into it's decoder while the pooled output of the convolution is fed to the next encoder.
+
+````
+    def forward(self, x):
+        # Encoder
+        enc1, x = self.encoder1(x)
+        enc2, x = self.encoder2(x)
+        enc3, x = self.encoder3(x)
+        enc4, x = self.encoder4(x)
+
+        # Bottleneck
+        x = self.bottleneck(x)
+
+        # Decoder
+        x = self.decoder1(x, enc4)
+        x = self.decoder2(x, enc3)
+        x = self.decoder3(x, enc2)
+        x = self.decoder4(x, enc1)
+
+        # Classifier
+        outputs = self.outputs(x)
+
+        return outputs
+````
+The encoders as can be seen in the code snipet bellow are comprised of a convolutional block and a max pooling layer. The decoders are comprised of a transpose convolutional layer and a convolutional block. The bottleneck layer is a simple convolutional block.
+
+````
+class encoder_block(nn.Module):
+    def __init__(self, in_c, out_c):
+        super().__init__()
+
+        self.conv = conv_block(in_c, out_c)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+    def forward(self, inputs):
+        x = self.conv(inputs)
+        p = self.pool(x)
+
+        return x, p
+
+
+class decoder_block(nn.Module):
+    def __init__(self, in_c, out_c):
+        super().__init__()
+
+        self.up = nn.ConvTranspose2d(in_c, out_c, kernel_size=2, stride=2)
+        self.conv = conv_block(in_c, out_c)
+
+    def forward(self, inputs, skip):
+        x = self.up(inputs)
+        x = torch.cat([x, skip], dim=1)
+        x = self.conv(x)
+
+        return x
+````
+The architecture is shown in the following figure. 
+<figure><img src="images/Untitled.jpg" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Structure a similar U-Net network, not representative of ours, added for clarity sake</b></figcaption></figure>
 
 ## Training Procedure
 - How did we train it?
