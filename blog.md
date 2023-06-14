@@ -141,7 +141,7 @@ for param in UNet.parameters():
 
 We set the input parameters like epochs (10) and learning rate (0.0001) which turned out to be the optimal and more stable after parameter tuning. The number of input channels are 3 as they represent the three channels (R, G, B). We initialize the parameters of the GenISP network as adviced in previous research papers that created it. We decided to run the loops on the cuda GPU, because of its much higher parallel performance in order to processing epochs faster.
 
-The training loop performs the forward and backward passes of the network. The input data is fed to the PreNet and the output of the PreNet is the fed to the pre-trained U-Net model after some adjustments in the size using padding.
+The training loop performs the forward and backward passes of the network. The input data is fed to the PreNet and the output of the PreNet is the fed to the pre-trained U-Net model after some adjustments in the size using padding. We use Cross Entropy Loss as the criterion and the Adam optimizer based on the literature and our research.
 
 ## Results - Training Set
 In this section we will outline the results obtained via the experiments on the trainin set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
@@ -175,10 +175,10 @@ Finally, looking at the average accuracy, the U-Net alone reaches an accuracy of
 ### Pre-Net with U-Net
 At this point in time, we have a trained U-Net on an urban scenery data segmentation task. The next objective is to freeze the weights of the trained U-Net, which we do as follows:
 
-```python 
+<!-- ```python 
 for param in UNet.parameters():
     param.requires_grad = False # Freeze the UNet weights
-```
+``` -->
 
 We are now able to pass the image through the pre-net before passing it to the U-Net. To reiterate, this idea is inspired from [1], where the authors use a pre-net in order to do some form of early processing on the image in order to achieve better performance on the main model. 
 
