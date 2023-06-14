@@ -153,6 +153,8 @@ The dataset used is the Cityscapes dataset, downloaded directly from the Citysca
 
 Before diving into the graphs and numbers, we propose to look at how the network improves on segmentation from a visual perspective. An important note is that each network was trained for 10 epochs, which roughly corresponded to 20 minutes of training time, the networks were trained on a GPU, namely, a GTX 1080 Ti, using PyTorch. 
 
+A batch size of 8 was used for all training. 
+
 ### U-Net
 The first output of the U-Net is (as one would expect) not very impressive. However, we would still like to highlight it as it shows that the network is clearly learning to segment. In the figure below, on the left hand side is the network output, right hand side is ground truth.
 
@@ -200,6 +202,13 @@ Note that both loss curves for the U-Net and the U-Net with pre-net are at the s
 
 The average accuracy for the training set with the combined network is 0.9638, meaning that this network is slightly less accurate than the U-Net alone. 
 
+### Discussion
+The first aspect to discuss is the results of the U-Net, which clearly seems to have satisfactory results after 10 epochs. This should not come as a surprise - as we mentioned earlier, the U-Net has a proven track record for segmentation tasks, as seen in publications such as [7]. However, when it comes to the Cityscapes dataset, we could not find any publications that used this specific combination, only a blog post on Medium had the same base setup, meaning the idea is somewhat novel, and yielding very satisfactory results, as illustrated in the segmentation map figures above.
+
+The next part to discuss is the combination of a pre-net with the U-Net. It is obviously difficult to go into great details on the learning process of the network, since it is already working with a trained U-Net, meaning the baseline was already 'good'. A major aspect to discuss, is that with this approach, we run the risk of the pre-net simply learning to set all weights to 0, such that it effectively has no-effect on the already traine (and efficient) U-Net. Upon inspection, however, we notice that this is not the case. Extrapolating from this, the network is clearly learning _something_. This is also notable in the fact that after 10 epochs, the segmentation map seems to be better than the equivalent map from the U-Net, despite the accuracy and loss being somewhat comparable on average. 
+
+To conclude, with only a limited number of training epochs, it is difficult to discuss whether this combination has an effect on imrpoving training. One aspect to note, is that this does add some flexibility to the network, however, the fact that there are 2 networks to train may deter some from adopting this method. 
+
 keep to making sure we don't get penalized by this:
 ![Alt text](image.png)
 - What results did we get?
@@ -212,6 +221,7 @@ keep to making sure we don't get penalized by this:
 
 ## Next Step
 - Future work
+    - train for more epochs!
 
 
 # References:
@@ -225,3 +235,7 @@ keep to making sure we don't get penalized by this:
 
 
 [5] Cityscapes dataset [!TODO]
+
+[6] Pan, Zhuokun, et al. "Deep learning segmentation and classification for urban village using a worldview satellite image based on U-Net." Remote Sensing 12.10 (2020): 1574.
+
+[7] Guo, Zhiling, et al. "Semantic segmentation for urban planning maps based on U-Net." IGARSS 2018-2018 IEEE International Geoscience and Remote Sensing Symposium. IEEE, 2018.
