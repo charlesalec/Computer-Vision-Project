@@ -139,6 +139,10 @@ for param in UNet.parameters():
     param.requires_grad = False # Freeze the UNet weights
 ```
 
+We set the input parameters like epochs (10) and learning rate (0.0001) which turned out to be the optimal and more stable after parameter tuning. The number of input channels are 3 as they represent the three channels (R, G, B). We initialize the parameters of the GenISP network as adviced in previous research papers that created it. We decided to run the loops on the cuda GPU, because of its much higher parallel performance in order to processing epochs faster.
+
+The training loop performs the forward and backward passes of the network. The input data is fed to the PreNet and the output of the PreNet is the fed to the pre-trained U-Net model after some adjustments in the size using padding.
+
 ## Results - Training Set
 In this section we will outline the results obtained via the experiments on the trainin set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
 
