@@ -12,7 +12,7 @@ Deep learning networks have demonstrated remarkable capabilities in various task
 
 ### Significance of Segmentation in Image Processing
 
-Segmentation serves as a foundational concept in numerous image processing applications, enabling the extraction of meaningful information from visual data. The ability to accurately delineate and classify objects within an image is crucial for tasks such as object recognition, scene understanding, and image-based decision-making systems. Among the various segmentation architectures, the U-Net stands out for its remarkable performance and has proven to have wide-spread applications (as discussed above).
+Segmentation serves as a foundational concept in numerous image processing applications, enabling the extraction of meaningful information from visual data. The ability to accurately delineate and classify objects within an image is crucial for tasks such as object recognition, scene understanding, and image-based decision-making systems. Among the various segmentation architectures, the U-Net stands out for its remarkable performance and has proven to have wide-spread applications (as discussed above) [6].
 
 ### Leveraging the U-Net's Track Record
 The U-Net has established itself as an influential network in the field of segmentation. With its proven track record of success across diverse segmentation tasks, it offers a solid foundation for further exploration. By using it as a baseline segmentation network, we can explore whether pre-processing the input has any significant difference on the networks ability to perform segentation in an urban scenery environment.
@@ -26,8 +26,8 @@ The motivation behind our work lies in the intriguing potential for achieving si
 <!-- ### A Promising Lead?
 Through our exploration of the U-Net architecture in the context of urban scene segmentation, we strive to push the boundaries of knowledge in the field of computer vision and image processing. By gaining a deeper understanding of the network's behavior and its suitability for complex segmentation tasks, we can contribute to the development of more accurate and robust segmentation techniques. Ultimately, our efforts aim to advance the capabilities of segmentation networks, enabling breakthroughs in various applications such as medical imaging, autonomous vehicles, and urban planning. -->
 
-- Why we did what we did?
-- What are we trying to achieve?
+<!-- - Why we did what we did?
+- What are we trying to achieve? -->
 
 ## Architecture
 For this implementation we attempted to connect two different architectures together. The first is a trainable pre-processing pipeline that was used in the past by [1] order to attempt the make object detectors see better in the dark. The second architecture is a vanilla [2][5] U-Net that we trained in semantic segmentation with the Cityscapes dataset [3]. The goal of this architecture is to improve the performance of the U-Net by pre-processing the images in a way that makes it easier for the U-Net to segment the images.
@@ -126,10 +126,10 @@ The architecture is shown in the following figure.
 <figure><img src="images/Untitled.jpg" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Structure a similar U-Net network, not representative of ours, added for clarity sake</b></figcaption></figure>
 
 ## Training Procedure
-- How did we train it?
+<!-- - How did we train it?
 - What experiment did we run?
 - Why did we run the experiment we did?
-- What weights did we use?
+- What weights did we use? -->
 
 At first we trained the UNet for 10 epochs with the Cityscapes dataset. After the training we extracted the weights of the trained network in the 'model.pth' file.
 
@@ -178,17 +178,10 @@ for epoch in t:
             output = np.argmax(output, axis=1)
             output_batch = output.shape[0]
             output = output.reshape((output_batch, output.shape[1], output.shape[2]))
-            # output = output.reshape((output.shape[1], output.shape[2]))
-
 
             labelmask = labelmask.detach().cpu().numpy()
             labelmast_batch = labelmask.shape[0]
             labelmask = labelmask.reshape((labelmast_batch, labelmask.shape[1], labelmask.shape[2]))
-            # labelmask = labelmask.reshape((labelmask.shape[1], labelmask.shape[2]))
-            # plt.imshow(output)
-            # plt.show()
-            # plt.imshow(labelmask)
-            # plt.show()
             
             
             # concat output and labelmask
@@ -306,18 +299,18 @@ To conclude, with only a limited number of training epochs, it is difficult to d
 
 keep to making sure we don't get penalized by this:
 ![Alt text](image.png)
-- What results did we get?
+<!-- - What results did we get?
 - Explain results
 - Motivate results
 - Why do we think it acts like that?
-- How can they be interpreted?
+- How can they be interpreted? -->
 
 
 ## Next Step
 For future work we would like to leave some hyperparameter tuning for example train the models for more epochs. The reason we did not do that is that the dataset is big and our resources and time were limited and we decided to train it for 10 epochs which is not a big number but adequate to lead us to results and comparisons.
-
+<!-- 
 - Future work
-    - train for more epochs!
+    - train for more epochs! -->
 
 
 # References:
