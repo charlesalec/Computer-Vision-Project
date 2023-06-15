@@ -1,4 +1,5 @@
-# Using a U-Net with Pre-Processing Network for Semantic Urban Scene Segmentation 
+# Using a U-Net with Pre-Processing Network for Semantic Urban Scene Segmentation
+
 In the following blog post we propose the evaluation of the performance of U-Net in the task of semantic segmentation of urban imagery. This is interesting to investigate because this is quite a new task, where we then propose to evaluate what results are achievable. In addition, we propose to attempt to leverage the flexibility by adding a second network, in order to see how pre-processing can add additional performance. The pre-processing network is inspired by the work of [1], where they propose a pre-processing network to improve the performance of object detectors in the dark. We propose to use a similar network to see if we can improve the performance of the U-Net in the task of semantic segmentation of urban imagery, by performing hierarchical feature extraction.
 
 ## Goals
@@ -330,7 +331,8 @@ One of the research questions that we originally wanted to tackle but fell outsi
 <!-- 
 - Future work
     - train for more epochs! -->
-
+# Link to repository:
+https://github.com/AlexDeLos/Computer-Vision-Project.git
 
 # References:
 [1] Morawski, I., Chen, Y. A., Lin, Y. S., Dangi, S., He, K., & Hsu, W. H. (2022). Genisp: Neural isp for low-light machine cognition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (pp. 630-639).
