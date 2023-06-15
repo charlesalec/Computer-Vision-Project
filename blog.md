@@ -143,7 +143,7 @@ class decoder_block(nn.Module):
         return x
 ````
 The architecture is shown in the following figure. 
-<figure><img src="images/Untitled.jpg" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Structure a similar U-Net network, not representative of ours, added for clarity sake</b></figcaption></figure>
+<figure><img src="images/Untitled.jpg" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Structure a similar U-Net network. This not representative of the structure of our network, and was added for clarity's sake</b></figcaption></figure>
 
 ## Training Procedure
 <!-- - How did we train it?
@@ -254,7 +254,7 @@ A batch size of 8 was used for all training.
 ### U-Net
 The first output of the U-Net is (as one would expect) not very impressive. However, we would still like to highlight it as it shows that the network is clearly learning to segment. In the figure below, on the left hand side is the network output, right hand side is ground truth.
 
-<figure><img src="images/unet_epoch_1.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Epoch 1, output from the U-Net, Loss: 1.4606. At first the network does not know how to distinguish</b></figcaption></figure>
+<figure><img src="images/unet_epoch_1.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Epoch 1, output from the U-Net, Loss: 1.4606. At first the network does not know how to distinguish.</b></figcaption></figure>
 
 After 10 epochs, the network produces the following segmentation map:
 <figure><img src="images/unet_epoch_10.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Epoch 10, output from the U-Net, Loss: 0.097. By the final epoch the network preforms very well.</b></figcaption></figure>
@@ -262,7 +262,7 @@ After 10 epochs, the network produces the following segmentation map:
 Clearly, the U-Net is performiing generally well, given the fact that it is only trained for 10 epochs. We can see that the network output (left) has a region that is not correctly segmented to the right of the image, around the contour of the car. We also see the car itself is not properly segmented.
 
 
-<figure><img src="images/unet_loss_10_epochs.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>U-Net loss after 10 epochs, As expected loss goes down with the training and start to stabilize, we can therefore reason that it will not reduce further</b></figcaption></figure>
+<figure><img src="images/unet_loss_10_epochs.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>U-Net loss after 10 epochs, As expected loss goes down with the training and start to stabilize, we can therefore reason that it will not reduce further.</b></figcaption></figure>
 
 It is worth stating again, that given the short training time/number of epochs, one can safely assume that the network would eventually improve on these minor areas, however, extensive training was considered to be out of the scope of this project, since we are drawing a comparison between two architectures, we were mostly interested in the shape of the loss curve, and the accuracy.
 
@@ -280,7 +280,7 @@ We are now able to pass the image through the pre-net before passing it to the U
 
 With this in mind, we propose to evaluate the results in a way consistent with how we evaluated the U-Net results: namely, examine the output at the first epoch, and the last epoch, while looking at the average accuracy and loss.
 
-<figure><img src="images/prenet_epoch_1.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Epoch 1, output from the Pre-Net, Loss: 0.404. At the start the pre-ne tonly adds noise to the image</b></figcaption></figure>
+<figure><img src="images/prenet_epoch_1.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Epoch 1, output from the Pre-Net, Loss: 0.404. At the start the pre-ne tonly adds noise to the image.</b></figcaption></figure>
 
 From the figure above, we can see that the network is clearly doing _something_ when it comes to segmenting, but this is almost certainly due to the already traine U-Net. 
 
@@ -301,11 +301,11 @@ The average accuracy for the training set with the combined network is **0.9638*
 ## Results - Test Set
 After performing the testing procedure as described above we have the following results. As mentioned above the accuracy of the UNet only is **0.9706** whilst the accuracy of the combined pipeline is **0.9638**. Below we illustrate a comparison of the prediction to the ground truth from the testing set for the U-Net. On the left there is the predicted segmentation and on the right its the ground truth. As we can see the model performs really well even in the objects that are very far apart.
 
-<figure><img src="images/eleni.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Prediction (left) and ground truth (right) comparison in the test set. Notice the high levels of accuracy between the prediction and the ground truth</b></figcaption></figure>
+<figure><img src="images/eleni.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Prediction (left) and ground truth (right) comparison in the test set. Notice the high levels of accuracy between the prediction and the ground truth.</b></figcaption></figure>
 
 Finally we will demonstrate the same comparison for the combined PreNet and U-Net pipeline. As we can see the segmentation is again very good as the predicted image is very close to the ground truth.
 
-<figure><img src="images/hellooo.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Prediction (left) and ground truth (right) comparison in the test set. Notice the similar levels of accuracy between the prediction and the ground truth compared to the U-Net alone </b></figcaption></figure>
+<figure><img src="images/hellooo.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Prediction (left) and ground truth (right) comparison in the test set. Notice the similar levels of accuracy between the prediction and the ground truth compared to the U-Net alone.</b></figcaption></figure>
 
 ### Discussion
 The first aspect to discuss is the results of the U-Net, which clearly seems to have satisfactory results after 10 epochs. This should not come as a surprise - as we mentioned earlier, the U-Net has a proven track record for segmentation tasks, as seen in publications such as [7]. However, when it comes to the Cityscapes dataset, we could not find any publications that used this specific combination, only a blog post on Medium had the same base setup, meaning the idea is somewhat novel, and yielding very satisfactory results, as illustrated in the segmentation map figures above.
