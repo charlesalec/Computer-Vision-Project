@@ -1,9 +1,9 @@
 # Using a U-Net with Pre-Processing Network for Semantic Urban Scene Segmentation
 
-In the following blog post we propose to evlauate the performance of a classic U-Net architecture in the task of semantic segmentation of urban imagery, more specifically on the Cityscapes dataset. In addition, we propose to attempt to add flexibility to the network by adding a trainable pre-network, in order to see how pre-processing can add additional performance. The pre-processing network is inspired by the work of [1], where they propose a pre-processing network to improve the performance of object detectors in the dark. We propose to use a similar network to see if we can improve the performance of the U-Net in the task of semantic segmentation of urban imagery, by performing hierarchical feature extraction. 
+In the following blog post we propose to evlauate the performance of a classic U-Net architecture in the task of semantic segmentation of urban imagery, more specifically on the Cityscapes dataset. In addition, we propose to attempt to add flexibility to the network by adding a trainable pre-network, in order to see how pre-processing can add additional performance. The pre-processing network is inspired by the work of [1], where they propose a pre-processing network to improve the performance of object detectors in the dark. We propose to use a similar network to see if we can improve the performance of the U-Net in the task of semantic segmentation of urban imagery, by attempting performing hierarchical feature extraction at an earlier stage. 
 
 ## Goals
-Since the advent of deep learning, the task of segmentation has become one of the principle vision tasks, with applications in the medical field (to segment bones, tissue, amongst many others) all the way too applications in environmental planning, disaster management, and autonomous vehicles. In this blog post, we discuss our attempts at improving a well known network used for segmentation: the U-Net, which will be further discussed in the architecture section. The U-Net has become an eponymous network, and has shown promising results across a variety of segmentation tasks. Originally made and trained in order to do segmentation on medical images [2], it has also been used to 'lighten' dark images [4]. The specific segmentation task at hand concerns the Cityscapes dataset [3], a well known urban scenes dataset. More specifically, we work with the gtFine dataset (roughly 5000 images). Our aim is to hopefully improve the segmentation results of the U-Net by adding a network at the front (to preprocess the data) and hopefully improve the performance (accuracy) of the U-Net. Our motivation stems from the inspiration drawn from the GenISP network introduced in reference [1]. This network aims to enhance the interpretability of images for subsequent processing by the network. Similarly, we seek to improve the segmentation results by augmenting the U-Net with a pre-processing network that can make the input data more informative and conducive to accurate segmentation. Currently, U-Net models used for semantic segmentation are simply equipped with an encoder and decoder, with no pre-processing of the input data.
+Since the advent of deep learning, the task of segmentation has become one of the principle vision tasks, with applications in the medical field (to segment bones, tissue, amongst many others) all the way to applications in environmental planning, disaster management, and autonomous vehicles. In this blog post, we discuss our attempts at improving a well known network used for segmentation: the U-Net, which will be further discussed in the architecture section. The U-Net has become an eponymous network, and has shown promising results across a variety of segmentation tasks. Originally made and trained in order to do segmentation on medical images where a limited training set was available[2], it has also been used to 'lighten' dark images [4]. The specific segmentation task at hand concerns the Cityscapes dataset [3], a well known urban scenes dataset. More specifically, we work with the gtFine dataset (roughly 5000 images). Our aim is to hopefully improve the segmentation results of the U-Net by adding a network at the front (to preprocess the data) and hopefully improve the performance (accuracy) of the U-Net. Our motivation stems from the inspiration drawn from the GenISP network introduced in reference [1]. This network aims to enhance the interpretability of images for subsequent processing by the network. Similarly, we seek to improve the segmentation results by augmenting the U-Net with a pre-processing network that can make the input data more informative and conducive to accurate segmentation. Currently, U-Net models used for semantic segmentation are simply equipped with an encoder and decoder, with no pre-processing of the input data.
 
 By incorporating a trainable pre-processing network, we aim to enhance the U-Net's ability to effectively capture and interpret the features relevant to urban scene segmentation. Through this approach, we aspire to achieve improved performance in terms of segmentation accuracy, thereby advancing the capabilities of the U-Net and contributing to the broader field of computer vision and image analysis.
 
@@ -49,7 +49,7 @@ output = UNet(output2)
 
 
 <figure><img src="images/image.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Diagram of the block in the pre-processing</b></figcaption></figure>
-For our pre-processing pipeline we have taken inspiration from the Proposed pre-processing pipeline from [1]. The goal of this was to change the image into something that the U-Net would be able to segment better. The pipeline consists of 2 blocks, the ConvWB and ConvCC blocks. These blocks are then followed by a shallow ConvNet, this can be the following snipet of code and in figure above:
+For our pre-processing pipeline we have taken inspiration from the proposed pre-processing pipeline from [1]. The goal of this was to change the image into something that the U-Net would be able to segment better. The pipeline consists of 2 blocks, the ConvWB and ConvCC blocks. These blocks are then followed by a shallow ConvNet, this can be the following snipet of code and in figure above:
 
 ````python
     def forward(self, batch_input):
@@ -65,12 +65,12 @@ For our pre-processing pipeline we have taken inspiration from the Proposed pre-
         return self.shallow(batch_input)
 ````
 
-It consists of several layers of convolutions, Leaky ReLU together with Max pooling, and ending in a Multi Layer Perceptron (MLP) layer. This MLP layer is the only thing that makes the ConvWB and ConvCC blocks different, as they have a different number of outputs (3 and 9 respectively).These outputs are then applied to the pixel values of the image in the following way
+It consists of several layers of convolutions, Leaky ReLU together with Max pooling, and ending in a Multi Layer Perceptron (MLP) layer. This MLP layer is the only thing that makes the ConvWB and ConvCC blocks different, as they have a different number of outputs (3 and 9 respectively). These outputs are then applied to the pixel values of the image in the following way
 <figure><img src="images/image-2.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>How the output of the ConvWB block is applied to the colors of the image</b></figcaption></figure>
 
 <figure><img src="images/image-3.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>How the output of the ConvCC block is applied to the colors of the image</b></figcaption></figure>
 
-Finally the new image is fed into the Shallow ConcNet block (explained in the first figure of this section and in the code snipet bellow) and the output is then a new image that should be easier for U-Net to preform image segmentation on. This shallowNet consists of two convolutional layers with Instance Normalization and Leaky ReLU in between them. The output of this is then fed into the U-Net.
+Finally the new image is fed into the Shallow ConvNet block (explained in the first figure of this section and in the code snipet below) and the output is then a new image that should be easier for U-Net to preform image segmentation on. This shallowNet consists of two convolutional layers with Instance Normalization and Leaky ReLU in between them. The output of this is then fed into the U-Net.
 ````python
     def shallowSQ(self,in_channels, hidden_channels, out_features):
         return nn.Sequential(
@@ -87,7 +87,7 @@ Finally the new image is fed into the Shallow ConcNet block (explained in the fi
 ````
 
 ### U-Net
-For the main backbone of our architecture we used a U-Net network that was trined for the task of image segmentation. The architecture goes 4 encoders deep before a bottleneck layer and then 4 decoders. In the forward pass of the network each encoder is connected to both the following decoder and the next encoder. To the next encoder the convolution output is fed into it's decoder while the pooled output of the convolution is fed to the next encoder.
+For the main backbone of our architecture we used a U-Net network that was trained for the task of image segmentation. The architecture goes 4 encoders deep before a bottleneck layer and then 4 decoders. In the forward pass of the network each encoder is connected to both the following decoder and the next encoder. To the next encoder the convolution output is fed into it's decoder while the pooled output of the convolution is fed to the next encoder.
 
 ````python
     def forward(self, x):
@@ -159,7 +159,7 @@ torch.save(UNet.state_dict(), "model.pth")
 print("Saved PyTorch Model State to model.pth")
 ```
 
-The idea as mentioned above is to use the PreNet (GenISP) network before the pretrained vanilla U-Net hoping that with the pre-processing network we will make the data easier segmentalize for the UNet.
+The idea as mentioned above is to use the PreNet (aGenISP variant [1]) network before the pretrained vanilla U-Net hoping that with the pre-processing network we will make the data easier segmentalize for the UNet.
 Subsequently, in order to train the final pipeline, we load the weights of the pre-trained vanilla U-Net from the 'model.pth' file and we freeze the U-Net parameters setting the parameters' <em>requires_grad</em> parameter to False so that the U-Net parameters will not train again (they will not be updated by the backward pass) as it is already pre-trained.
 
 ```python 
