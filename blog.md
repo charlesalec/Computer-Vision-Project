@@ -8,7 +8,6 @@ Since the advent of deep learning, the task of segmentation has become one of th
 By incorporating a trainable pre-processing network, we aim to enhance the U-Net's ability to effectively capture and interpret the features relevant to urban scene segmentation. Through this approach, we aspire to achieve improved performance in terms of segmentation accuracy, thereby advancing the capabilities of the U-Net and contributing to the broader field of computer vision and image analysis.
 
 ## Motivations
-- Make sure to cover everything the story line.
 
 ### Advancing the Field through Experimentation
 Deep learning networks have demonstrated remarkable capabilities in various tasks, yet the underlying mechanisms that drive their performance often remain elusive. To advance the field and gain deeper insights into these networks, experimentation plays a crucial role. By exploring new approaches, modifications, and combinations of established architectures, researchers can uncover novel techniques that improve performance and expand the boundaries of what is achievable. In this regard, we propose to use a pre-network similar to the network used in [1], in order to see if images become more readable to a classical U-Net architecture.
