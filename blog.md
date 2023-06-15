@@ -4,8 +4,9 @@
 Since the advent of deep learning, the task of segmentation has become one of the principle vision tasks, with applications in the medical field (to segment bones, tissue, amongst many others) all the way too applications in environmental planning, disaster management, and autonomous vehicles. In this blog post, we discuss our attempts at improving a well known network used for segmentation: the U-Net, which will be further discussed in the architecture section. The U-Net has become an eponymous network, and has shown promising results across a variety of segmentation tasks. Originally made and trained in order to do segmentation on medical images [add precision] [2], it has also been used to 'lighten' dark images [4]. The specific segmentation task at hand concerns the Cityscapes dataset [3], a well known urban scenes dataset. More specifically, we work with the gtFine dataset (roughly XXXXX images). Our aim is to hopefully improve the segmentation results of the U-Net by adding a network at the front (to preprocess the data) and hopefully improve the performance (accuracy) of the U-Net. Our motivation stems from the inspiration drawn from the GenISP network introduced in reference [1]. This network aims to enhance the interpretability of images for subsequent processing by the network. Similarly, we seek to improve the segmentation results by augmenting the U-Net with a pre-processing network that can make the input data more informative and conducive to accurate segmentation.
 
 By incorporating a trainable pre-processing network, we aim to enhance the U-Net's ability to effectively capture and interpret the features relevant to urban scene segmentation. Through this approach, we aspire to achieve improved performance in terms of segmentation accuracy, thereby advancing the capabilities of the U-Net and contributing to the broader field of computer vision and image analysis.
-  
+
 ## Motivations
+- Make sure to cover everything the story line.
 
 ### Advancing the Field through Experimentation
 Deep learning networks have demonstrated remarkable capabilities in various tasks, yet the underlying mechanisms that drive their performance often remain elusive. To advance the field and gain deeper insights into these networks, experimentation plays a crucial role. By exploring new approaches, modifications, and combinations of established architectures, researchers can uncover novel techniques that improve performance and expand the boundaries of what is achievable. In this regard, we propose to use a pre-network similar to the network used in [1], in order to see if images become more readable to a classical U-Net architecture.
@@ -15,7 +16,7 @@ Deep learning networks have demonstrated remarkable capabilities in various task
 Segmentation serves as a foundational concept in numerous image processing applications, enabling the extraction of meaningful information from visual data. The ability to accurately delineate and classify objects within an image is crucial for tasks such as object recognition, scene understanding, and image-based decision-making systems. Among the various segmentation architectures, the U-Net stands out for its remarkable performance and has proven to have wide-spread applications (as discussed above) [6].
 
 ### Leveraging the U-Net's Track Record
-The U-Net has established itself as an influential network in the field of segmentation. With its proven track record of success across diverse segmentation tasks, it offers a solid foundation for further exploration. By using it as a baseline segmentation network, we can explore whether pre-processing the input has any significant difference on the networks ability to perform segentation in an urban scenery environment.
+The U-Net has established itself as an influential network in the field of segmentation. With its proven track record of success across diverse segmentation tasks, it offers a solid foundation for further exploration. By using it as a baseline segmentation network, we can explore whether pre-processing the input has any significant difference on the networks ability to perform segmentation in an urban scenery environment.
 
 ### Exploring Urban Scenery Segmentation
 Urban scenes pose unique challenges for segmentation algorithms due to their complexity and diverse elements such as buildings, roads, vehicles, and pedestrians. The Cityscapes dataset provides an excellent opportunity to delve into the segmentation of urban scenes and evaluate the U-Net's performance in this context. 
@@ -91,7 +92,7 @@ For the main backbone of our architecture we used a U-Net network that was trine
 
         return outputs
 ````
-The encoders as can be seen in the code snipet bellow are comprised of a convolutional block and a max pooling layer. The decoders are comprised of a transpose convolutional layer and a convolutional block. The bottleneck layer is a simple convolutional block.
+The encoders as can be seen in the code snippet bellow are comprised of a convolutional block and a max pooling layer. The decoders are comprised of a transpose convolutional layer and a convolutional block. The bottleneck layer is a simple convolutional block.
 
 ````python
 class encoder_block(nn.Module):
@@ -139,29 +140,26 @@ torch.save(UNet.state_dict(), "model.pth")
 print("Saved PyTorch Model State to model.pth")
 ```
 
-The idea as mentioned above is to use the PreNet (GenISP) network before the pretrained vanilla U-Net hoping that with the pre-processing network we will make the data easier segmentable for the UNet.
-Subsequently, in order to train the final pipeline, we load the weights of the pre-trained vanilla U-Net from the 'model.pth' file and we freeze the U-Net parameters setting the parametes' <em>requires_grad</em> parameter to False so that the U-Net parameters will not train again (they will not be updated by the backward pass) as it is already pre-trained.
+The idea as mentioned above is to use the PreNet (GenISP) network before the pretrained vanilla U-Net hoping that with the pre-processing network we will make the data easier segmentalize for the UNet.
+Subsequently, in order to train the final pipeline, we load the weights of the pre-trained vanilla U-Net from the 'model.pth' file and we freeze the U-Net parameters setting the parameters' <em>requires_grad</em> parameter to False so that the U-Net parameters will not train again (they will not be updated by the backward pass) as it is already pre-trained.
 
 ```python 
 for param in UNet.parameters():
     param.requires_grad = False # Freeze the UNet weights
 ```
 
-We set the input parameters like epochs (10) and learning rate (0.0001) which turned out to be the optimal and more stable after parameter tuning. The number of input channels are 3 as they represent the three channels (R, G, B). We initialize the parameters of the GenISP network as adviced in previous research papers that created it. We decided to run the loops on the cuda GPU, because of its much higher parallel performance in order to processing epochs faster.
+We set the input parameters like epochs (10) and learning rate (0.0001) which turned out to be the optimal and more stable after parameter tuning. The number of input channels are 3 as they represent the three channels (R, G, B). We initialize the parameters of the GenISP network as advised in previous research papers that created it. We decided to run the loops on the CUDA GPU, because of its much higher parallel performance in order to processing epochs faster.
 
 The training loop performs the forward and backward passes of the network. The input data is fed to the PreNet and the output of the PreNet is the fed to the pre-trained U-Net model after some adjustments in the size using padding. We use Cross Entropy Loss as the criterion and the Adam optimizer based on the literature and our research. As we see below every 1000 inputs we show the ground truth image next to the prediction image so we can monitor the progress of the training. A sample of these pictures is illustrated in the Results section.
 
 ```python 
 t = trange(epochs, desc="Epochs", leave=True)
 for epoch in t:
-    # TODO: use tqdm for progress bar
     for idx_batch, (imagergb, labelmask, labelrgb) in enumerate(img_batch):
         imagergb = imagergb.to(device)
         labelmask = labelmask.to(device)
         labelrgb = labelrgb.to(device)
-        # print(imagergb.shape)
         optimizer.zero_grad()
-        # net = nn.Sequential(PreNet, F.pad(input=PreNet(imagergb), pad=(2, 2, 2, 2)),UNet)
         output1 = PreNet(imagergb)
         output2 = F.pad(input=output1, pad=(2, 2, 2, 2))
     
@@ -192,7 +190,7 @@ for epoch in t:
 ```
 
 ## Testing Procedure
-The purpose of this function is to perform the same iterations as the training function but on a different set of unseen images which is the test set and without the back propagation. For that we have already trained the PreNet seperately as well so we can get the PreNet wights the same way we did with the UNet. After loading the weights for both networks we proceed to predict the outputs of the pipeline of course without performing back propagation (using <em>with torch.no_grad()</em>). To calculate the accuracy we sum the correct answers and divide them by the total test set size so we can have the percentage of the test images that had been segmented correctly. For that as the problem is image segmentation and not classification we have to use the image and the label masks so that we can check if the object detection is correct, hence if the prediction is correct.
+The purpose of this function is to perform the same iterations as the training function but on a different set of unseen images which is the test set and without the back propagation. For that we have already trained the PreNet separately as well so we can get the PreNet wights the same way we did with the UNet. After loading the weights for both networks we proceed to predict the outputs of the pipeline of course without performing back propagation (using <em>with torch.no_grad()</em>). To calculate the accuracy we sum the correct answers and divide them by the total test set size so we can have the percentage of the test images that had been segmented correctly. For that as the problem is image segmentation and not classification we have to use the image and the label masks so that we can check if the object detection is correct, hence if the prediction is correct.
 
 ```python
 history_accuracy = []
@@ -223,7 +221,7 @@ print('Average accuracy:%.4f' % (sum(history_accuracy)/len(history_accuracy)))
 ```
 
 ## Results - Training Set
-In this section we will outline the results obtained via the experiments on the trainin set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
+In this section we will outline the results obtained via the experiments on the training set. The results break down into 2 comparable cases: the loss and average accuracy for the U-Net alone, and then for the U-Net with frozen weights, and the pre-net as a pre-processing unit.  
 
 For the results on the testing set, see the section below.
 
@@ -242,7 +240,7 @@ The first output of the U-Net is (as one would expect) not very impressive. Howe
 After 10 epochs, the network produces the following segmentation map:
 <figure><img src="images/unet_epoch_10.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>Epoch 10, output from the U-Net, Loss: 0.097</b></figcaption></figure>
 
-Clearly, the U-Net is performiing generally well, given the fact that it is only traned for 10 epochs. We can see that the network output (left) has a region that is not correctly segmented to the right of the image, around the contour of the car. We also see the car itself is not properly segmented.
+Clearly, the U-Net is performiing generally well, given the fact that it is only trained for 10 epochs. We can see that the network output (left) has a region that is not correctly segmented to the right of the image, around the contour of the car. We also see the car itself is not properly segmented.
 
 
 <figure><img src="images/unet_loss_10_epochs.png" alt="Trulli" style="width:100%"><figcaption align = "center"><b>U-Net loss after 10 epochs</b></figcaption></figure>
@@ -293,9 +291,9 @@ Finally we will demonstrate the same comparison for the combined PreNet and U-Ne
 ### Discussion
 The first aspect to discuss is the results of the U-Net, which clearly seems to have satisfactory results after 10 epochs. This should not come as a surprise - as we mentioned earlier, the U-Net has a proven track record for segmentation tasks, as seen in publications such as [7]. However, when it comes to the Cityscapes dataset, we could not find any publications that used this specific combination, only a blog post on Medium had the same base setup, meaning the idea is somewhat novel, and yielding very satisfactory results, as illustrated in the segmentation map figures above.
 
-The next part to discuss is the combination of a pre-net with the U-Net. It is obviously difficult to go into great details on the learning process of the network, since it is already working with a trained U-Net, meaning the baseline was already 'good'. A major aspect to discuss, is that with this approach, we run the risk of the pre-net simply learning to set all weights to 0, such that it effectively has no-effect on the already traine (and efficient) U-Net. Upon inspection, however, we notice that this is not the case. Extrapolating from this, the network is clearly learning _something_. This is also notable in the fact that after 10 epochs, the segmentation map seems to be better than the equivalent map from the U-Net, despite the accuracy and loss being somewhat comparable on average. 
+The next part to discuss is the combination of a pre-net with the U-Net. It is obviously difficult to go into great details on the learning process of the network, since it is already working with a trained U-Net, meaning the baseline was already 'good'. A major aspect to discuss, is that with this approach, we run the risk of the pre-net simply learning to set all weights to 0, such that it effectively has no-effect on the already trained (and efficient) U-Net. Upon inspection, however, we notice that this is not the case. Extrapolating from this, the network is clearly learning _something_. This is also notable in the fact that after 10 epochs, the segmentation map seems to be better than the equivalent map from the U-Net, despite the accuracy and loss being somewhat comparable on average. 
 
-To conclude, with only a limited number of training epochs, it is difficult to discuss whether this combination has an effect on imrpoving training. One aspect to note, is that this does add some flexibility to the network, however, the fact that there are 2 networks to train may deter some from adopting this method. 
+To conclude, with only a limited number of training epochs, it is difficult to discuss whether this combination has an effect on improving training. One aspect to note, is that this does add some flexibility to the network, however, the fact that there are 2 networks to train may deter some from adopting this method. 
 
 keep to making sure we don't get penalized by this:
 ![Alt text](image.png)
@@ -308,6 +306,8 @@ keep to making sure we don't get penalized by this:
 
 ## Next Step
 For future work we would like to leave some hyperparameter tuning for example train the models for more epochs. The reason we did not do that is that the dataset is big and our resources and time were limited and we decided to train it for 10 epochs which is not a big number but adequate to lead us to results and comparisons.
+
+- adaptation to specific tasks (FROM THE STORYLINE)
 <!-- 
 - Future work
     - train for more epochs! -->
